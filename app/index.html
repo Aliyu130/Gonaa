@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Gonaaaa — Your Farm Helper</title>
+<meta name="description" content="Ask Gonaaaa anything about your farm — in Hausa or English. Snap a photo of a sick crop and get an instant diagnosis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo:#1E2A4A; --indigo-mid:#2E4372;
+    --gold:#E0A82E; --gold-soft:#F2D488;
+    --cream:#F5EFE0; --leaf:#3F7A4D; --leaf-soft:#E4EFE6;
+    --ink:#22242B; --line:#E7DDC6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:'Instrument Sans',system-ui,sans-serif;background:var(--cream);display:flex;flex-direction:column;overflow:hidden}
+
+  .head{background:var(--indigo);padding:14px 14px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;padding-top:max(14px, env(safe-area-inset-top))}
+  .head .pm{width:32px;height:32px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque';font-weight:800;font-size:17px;color:var(--indigo)}
+  .head .tt{color:#fff;font-weight:700;font-size:16px;font-family:'Bricolage Grotesque';line-height:1}
+  .head .st{color:#93E9A9;font-size:10px;display:flex;align-items:center;gap:4px;margin-top:2px}
+  .head .dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+  @keyframes pulse{50%{opacity:.4}}
+  .head .lang{margin-left:auto;background:var(--indigo-mid);border-radius:999px;padding:3px;display:flex}
+  .head .lang button{border:none;background:transparent;color:#cfd6e6;font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;font-family:inherit}
+  .head .lang button.on{background:var(--gold);color:var(--indigo)}
+
+  .chat{flex:1;overflow-y:auto;padding:16px 12px;display:flex;flex-direction:column;gap:11px;-webkit-overflow-scrolling:touch}
+  .b{max-width:85%;padding:11px 13px;border-radius:16px;font-size:14.5px;line-height:1.52;white-space:pre-wrap;animation:pop .35s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(9px) scale(.98)}to{opacity:1;transform:none}}
+  .b.u{align-self:flex-end;background:var(--indigo-mid);color:#fff;border-top-right-radius:5px}
+  .b.a{align-self:flex-start;background:#fff;border:1px solid var(--line);color:var(--ink);border-top-left-radius:5px}
+  .b img.up{max-width:210px;border-radius:11px;margin-bottom:7px;display:block}
+
+  .typing{align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:16px;border-top-left-radius:5px;padding:13px 17px;display:flex;gap:5px}
+  .typing i{width:7px;height:7px;border-radius:50%;background:#b8ad90;animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+  .needcard{margin-top:10px;background:var(--indigo);border-radius:12px;padding:10px 12px;color:#fff}
+  .needcard .nk{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-soft);font-weight:700}
+  .needcard .nv{font-size:14px;font-weight:700;text-transform:capitalize;margin-top:1px}
+  .needcard .nn{font-size:11.5px;color:#aeb8d0;margin-top:3px}
+
+  .quicks{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:#fff;border-top:1px solid var(--line);flex-shrink:0;scrollbar-width:none}
+  .quicks::-webkit-scrollbar{display:none}
+  .quicks button{flex-shrink:0;border:1px solid var(--line);background:var(--cream);border-radius:999px;padding:8px 15px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink)}
+  .quicks button:active{background:var(--gold-soft);border-color:var(--gold)}
+
+  .composer{display:flex;gap:8px;padding:10px 12px;background:#fff;flex-shrink:0;align-items:flex-end;padding-bottom:max(12px, env(safe-area-inset-bottom))}
+  .icbtn{width:42px;height:42px;border-radius:12px;background:var(--cream);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;cursor:pointer}
+  .icbtn:active{transform:scale(.93);background:var(--gold-soft)}
+  .composer input[type=text]{flex:1;border:1px solid var(--line);background:var(--cream);border-radius:12px;padding:12px 13px;font-size:15px;font-family:inherit;outline:none;min-width:0}
+  .composer input[type=text]:focus{border-color:var(--gold)}
+  .sendbtn{width:42px;height:42px;border-radius:12px;background:var(--gold);border:none;color:var(--indigo);font-size:16px;font-weight:800;cursor:pointer;flex-shrink:0}
+  .sendbtn:active{transform:scale(.93)}
+  .sendbtn:disabled{background:#c9bfa6}
+
+  .preview{display:none;align-items:center;gap:10px;padding:8px 12px;background:#fff;border-top:1px solid var(--line)}
+  .preview.show{display:flex}
+  .preview img{height:56px;width:56px;object-fit:cover;border-radius:10px}
+  .preview .x{width:24px;height:24px;border-radius:50%;background:var(--indigo);color:#fff;border:none;font-size:12px;cursor:pointer}
+  .preview small{color:#6B4A2B;font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div class="pm">G</div>
+  <div>
+    <div class="tt">Gonaaaa</div>
+    <div class="st"><span class="dot"></span> online · yana nan</div>
+  </div>
+  <div class="lang">
+    <button id="l-en" onclick="setLang('en')">English</button>
+    <button id="l-ha" class="on" onclick="setLang('ha')">Hausa</button>
+  </div>
+</div>
+
+<div class="chat" id="chat"></div>
+
+<div class="quicks" id="quicks"></div>
+
+<div class="preview" id="preview">
+  <img id="pv-img" alt="photo">
+  <small id="pv-txt">Photo ready — add a note or just send</small>
+  <button class="x" onclick="clearPhoto()">✕</button>
+</div>
+
+<div class="composer">
+  <button class="icbtn" onclick="document.getElementById('file').click()" title="Photo">📷</button>
+  <input id="file" type="file" accept="image/*" capture="environment" style="display:none" onchange="stagePhoto(event)">
+  <input id="q" type="text" autocomplete="off" onkeydown="if(event.key==='Enter')sendMsg()">
+  <button class="sendbtn" id="sendBtn" onclick="sendMsg()">➤</button>
+</div>
+
+<script>
+const API = "/api/chat";
+const chat = document.getElementById('chat');
+let lang='ha', busy=false, staged=null, history=[];
+
+const UI={
+  en:{ph:'Type your farming question…',pv:'Photo ready — add a note or just send',
+      intro:"Sannu! 👋 I'm Gonaaaa, your farm helper. Ask me anything about your crops, animals, soil or prices — or tap 📷 to send a photo of a sick plant.",
+      needK:'What you may need', needN:'We can connect you to a nearby supplier.',
+      err:'Connection problem — please try again.', photoDefault:'Please look at this crop photo.'},
+  ha:{ph:'Rubuta tambayarka ta noma…',pv:'Hoto ya shirya — ƙara bayani ko aika kawai',
+      intro:"Sannu! 👋 Ni Gonaaaa ce, mai taimakon gonarka. Ka tambaye ni komai game da shuka, dabbobi, ƙasa ko farashi — ko ka danna 📷 don aiko hoton shuka mai ciwo.",
+      needK:'Abin da za ka iya buƙata', needN:'Za mu iya haɗa ka da mai sayarwa kusa da kai.',
+      err:'Matsalar sadarwa — ka sake gwadawa.', photoDefault:'Ka duba wannan hoton shuka.'}
+};
+const QUICKS={
+  en:[['🍂 Sick crop','My crop leaves have spots and are turning yellow. What is wrong and what should I do?'],
+      ['🐛 Pest attack','Insects are eating my crop. How do I control them cheaply?'],
+      ['🌱 When to plant','When is the best time to plant and how do I prepare my land?'],
+      ['🧺 Fertilizer & seed','What fertilizer and seed should I use for a good harvest?'],
+      ['💰 Better price','How can I store my harvest and sell at a better price?'],
+      ['🐄 Livestock','My animals are not healthy. What should I check?']],
+  ha:[['🍂 Shuka mai ciwo','Ganyen shukata na da tabo kuma yana zama rawaya. Menene matsalar kuma me zan yi?'],
+      ['🐛 Kwari sun kai hari','Kwari suna cin shukata. Ta yaya zan shawo kansu da arha?'],
+      ['🌱 Lokacin shuka','Wanne lokaci ne mafi kyau na shuka kuma yaya zan shirya gona?'],
+      ['🧺 Taki da iri','Wanne taki da iri zan yi amfani da su don kyakkyawan girbi?'],
+      ['💰 Kyakkyawan farashi','Ta yaya zan adana girbi in sayar a kan kyakkyawan farashi?'],
+      ['🐄 Dabbobi','Dabbobina ba su da lafiya. Me zan duba?']]
+};
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function scrollChat(){chat.scrollTop=chat.scrollHeight}
+function bubble(cls,html){const d=document.createElement('div');d.className='b '+cls;d.innerHTML=html;chat.appendChild(d);scrollChat();return d}
+let typingEl=null;
+function showTyping(){typingEl=document.createElement('div');typingEl.className='typing';typingEl.innerHTML='<i></i><i></i><i></i>';chat.appendChild(typingEl);scrollChat()}
+function hideTyping(){if(typingEl){typingEl.remove();typingEl=null}}
+function setBusy(b){busy=b;document.getElementById('sendBtn').disabled=b}
+
+function setLang(l){
+  lang=l;
+  document.getElementById('l-en').classList.toggle('on',l==='en');
+  document.getElementById('l-ha').classList.toggle('on',l==='ha');
+  document.getElementById('q').placeholder=UI[l].ph;
+  document.getElementById('pv-txt').textContent=UI[l].pv;
+  const q=document.getElementById('quicks');q.innerHTML='';
+  QUICKS[l].forEach(([label,question])=>{
+    const b=document.createElement('button');b.textContent=label;
+    b.onclick=()=>sendMsg(question);q.appendChild(b);
+  });
+  if(chat.children.length===0)bubble('a',esc(UI[l].intro));
+}
+
+function stagePhoto(e){
+  const f=e.target.files?.[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    staged={dataUrl:r.result,b64:r.result.split(',')[1],type:f.type};
+    document.getElementById('pv-img').src=r.result;
+    document.getElementById('preview').classList.add('show');
+  };
+  r.readAsDataURL(f);
+  e.target.value='';
+}
+function clearPhoto(){staged=null;document.getElementById('preview').classList.remove('show')}
+
+async function sendMsg(forced){
+  if(busy)return;
+  const input=document.getElementById('q');
+  const text=(forced ?? input.value).trim();
+  if(!text && !staged)return;
+  input.value='';
+
+  const img=staged; clearPhoto();
+  let html = img?`<img class="up" src="${img.dataUrl}">`:'';
+  html += esc(text || UI[lang].photoDefault);
+  bubble('u',html);
+
+  // build API content for this turn
+  let content;
+  if(img){
+    content=[{type:'image',source:{type:'base64',media_type:img.type,data:img.b64}},
+             {type:'text',text:text||UI[lang].photoDefault}];
+  }else content=text;
+  history.push({role:'user',content});
+
+  setBusy(true); showTyping();
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:history,lang})});
+    const data=await r.json();
+    if(!r.ok||!data.text)throw new Error('bad response');
+    let raw=data.text, need=null;
+    const m=raw.match(/\[NEEDS:\s*([^\]]+)\]\s*$/i);
+    if(m){need=m[1].trim();raw=raw.replace(m[0],'').trim();}
+    history.push({role:'assistant',content:data.text});
+    hideTyping();
+    let ah=esc(raw);
+    if(need)ah+=`<div class="needcard"><div class="nk">${UI[lang].needK}</div><div class="nv">${esc(need)}</div><div class="nn">${UI[lang].needN}</div></div>`;
+    bubble('a',ah);
+  }catch(e){
+    hideTyping();
+    history.pop(); // let them retry cleanly
+    bubble('a',esc(UI[lang].err));
+  }finally{setBusy(false)}
+}
+
+setLang('ha');
+</script>
+</body>
+</html>
